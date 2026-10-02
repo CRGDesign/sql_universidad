@@ -18,6 +18,8 @@ DROP TABLE IF EXISTS asignatura;
 DROP TABLE IF EXISTS alumno;
 DROP TABLE IF EXISTS matricula;
 DROP TABLE IF EXISTS impartir;
+
+
 	-- Creación de tablas
 CREATE TABLE curso(
 	idCurso numeric(2),
@@ -114,11 +116,11 @@ INSERT INTO curso VALUES(6, 'Doctorado', 6);
 /*Importamos el archivo alumnos.txt en la tabla alumno estableciendo ";" como separador
 entre campos y "\n", significa salto de linea, para definir que cada 
 registro acaba al haber salto de linea*/
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/alumnos.txt'
+LOAD DATA LOCAL INFILE '/home/alumnom/Escritorio/ER/sql_universidad/ficheros de datos externos/alumnos.txt'
 INTO TABLE alumno
 FIELDS TERMINATED BY ';'
-LINES terminated by '\n'
-ignore 1 rows;
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
 
     -- Carga con inserción manual de datos profesor
 INSERT INTO profesor VALUES('PR001','34417139B','Juan','Infante','Fraidias','juan.infante.fraidias@ucm.com','Calle de los Almendros , 86',28070,'Las Rozas','Madrid','Asociados');
@@ -171,7 +173,7 @@ INSERT INTO profesor VALUES('PR047','76965754O','Rafael','Figueroa','Casal','raf
 INSERT INTO profesor VALUES('PR048','48034341Q','Jose Manuel','Nevado','Veras','jose.manuel.nevado.veras@ucm.com','Calle Arlanza , 170',28001,'Ajalvir','Madrid','Catedráticos de Universidad');
 
 	-- Importamos los teléfonos de contacto de profesores como archivo .CSV
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/telefonosContacto.csv'
+LOAD DATA LOCAL INFILE '/home/alumnom/Escritorio/ER/sql_universidad/ficheros de datos externos/telefonosContacto.csv'
 INTO TABLE tlfContactoProf
 FIELDS TERMINATED BY ';'
 LINES terminated by '\n'
@@ -281,7 +283,7 @@ INSERT INTO asignatura VALUES (6,'AS100','Modelos de decisión en marketing','2'
 
 	/* Importamos impartir.csv en la tabla 'impartir'. En este caso los campos del csv está separado por tabulaciones.
     Por eso, usaremos la secuencia de escape '\t' para indicar a SQL como separar los datos*/
-LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 8.0/Uploads/impartir.txt'
+LOAD DATA LOCAL INFILE '/home/alumnom/Escritorio/ER/sql_universidad/ficheros de datos externos/impartir.txt'
 INTO TABLE impartir
 FIELDS TERMINATED BY '\t'
 LINES terminated by '\n'
@@ -2126,3 +2128,17 @@ ORDER BY curso ASC, nombre ASC;
 UNION
 (SELECT nombre, email FROM profesor);
     
+
+SELECT nombre
+FROM asignatura
+WHERE idAsignatura = (
+    SELECT idAsignatura
+    FROM matricula
+    WHERE nota = 1.01
+);
+
+SELECT asignatura.nombre
+FROM asignatura asignatura
+JOIN matricula matricula
+    ON asignatura.idAsignatura = matricula.idAsignatura
+WHERE matricula.nota = 1.01;

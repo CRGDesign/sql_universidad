@@ -1,0 +1,88 @@
+CREATE OR REPLACE TABLE `CURSO` (
+	`id_curso` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+	`nombre_curso` VARCHAR(100),
+	`num_asignaturas` INTEGER,
+	PRIMARY KEY(`id_curso`)
+);
+
+CREATE OR REPLACE TABLE `PROFESOR` (
+	`id_profesor` VARCHAR(5) UNSIGNED NOT NULL,
+	`NIF` VARCHAR(9),
+	`nombre` VARCHAR(50),
+	`apellido1` VARCHAR(50),
+	`apellido2` VARCHAR(50),
+	`email` VARCHAR(100),
+	`direccion` VARCHAR(100),
+	`codigo_postal` INTEGER,
+	`municipio` VARCHAR(50),
+	`provincia` VARCHAR(50),
+	`categoria` VARCHAR(100),
+	PRIMARY KEY(`id_profesor`)
+);
+
+CREATE OR REPLACE TABLE `TELEFONOS_PROFESOR` (
+	`id_profesor` VARCHAR(5) UNSIGNED NOT NULL,
+	`telefono` INTEGER,
+	PRIMARY KEY(`id_profesor`)
+);
+
+CREATE OR REPLACE TABLE `ASIGNATURA` (
+	`id_asignatura` VARCHAR(5) UNSIGNED NOT NULL,
+	`nombre` VARCHAR(100),
+	`caracter` VARCHAR(255),
+	`creditos` INTEGER,
+	`cuatrimestre` INTEGER,
+	`id_curso` INTEGER,
+	`id_coordinador` VARCHAR(5),
+	PRIMARY KEY(`id_asignatura`)
+);
+
+CREATE OR REPLACE TABLE `ALUMNO` (
+	`id_alumno` VARCHAR(5) UNSIGNED NOT NULL,
+	`NIF` VARCHAR(9),
+	`nombre` VARCHAR(50),
+	`apellido1` VARCHAR(50),
+	`apellido2` VARCHAR(50),
+	`email` VARCHAR(100),
+	`direccion` VARCHAR(100),
+	`codigo_postal` INTEGER,
+	`municipio` VARCHAR(100),
+	`provincia` VARCHAR(100),
+	`beca` VARCHAR(100),
+	PRIMARY KEY(`id_alumno`)
+);
+
+CREATE OR REPLACE TABLE `MATRICULA` (
+	`id_alumno` VARCHAR(5) UNSIGNED NOT NULL,
+	`id_asignatura` VARCHAR(5),
+	`note` FLOAT,
+	PRIMARY KEY(`id_alumno`)
+);
+
+CREATE OR REPLACE TABLE `IMPARTIR` (
+	`id_asignatura` VARCHAR(5) UNSIGNED NOT NULL,
+	`id_profesor` VARCHAR(5),
+	PRIMARY KEY(`id_asignatura`)
+);
+
+ALTER TABLE `ASIGNATURA`
+ADD FOREIGN KEY(`id_curso`) REFERENCES `CURSO`(`id_curso`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `ASIGNATURA`
+ADD FOREIGN KEY(`id_coordinador`) REFERENCES `PROFESOR`(`id_profesor`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `TELEFONOS_PROFESOR`
+ADD FOREIGN KEY(`id_profesor`) REFERENCES `PROFESOR`(`id_profesor`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `MATRICULA`
+ADD FOREIGN KEY(`id_alumno`) REFERENCES `ALUMNO`(`id_alumno`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `MATRICULA`
+ADD FOREIGN KEY(`id_asignatura`) REFERENCES `ASIGNATURA`(`id_asignatura`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `IMPARTIR`
+ADD FOREIGN KEY(`id_asignatura`) REFERENCES `ASIGNATURA`(`id_asignatura`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
+ALTER TABLE `IMPARTIR`
+ADD FOREIGN KEY(`id_profesor`) REFERENCES `PROFESOR`(`id_profesor`)
+ON UPDATE NO ACTION ON DELETE NO ACTION;
