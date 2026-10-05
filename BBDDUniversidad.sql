@@ -45,6 +45,7 @@ CREATE TABLE profesor(
     PRIMARY KEY(idProfesor)
     );
     
+
 CREATE TABLE tlfContactoProf(
 	idProfesor char(5) not null,
     telefono numeric(9) not null,
@@ -171,6 +172,8 @@ INSERT INTO profesor VALUES('PR045','66989687K','Maria Teresa','Valderrama','Rup
 INSERT INTO profesor VALUES('PR046','47970524A','Ana','Padron','Balada','ana.padron.balada@ucm.com','Calle de Argentona , 179',28002,'Boadilla del Monte','Madrid','Titulares Universidad');
 INSERT INTO profesor VALUES('PR047','76965754O','Rafael','Figueroa','Casal','rafael.figueroa.casal@ucm.com','Calle de la Aeronave , 37',28004,'Colmenarejo','Madrid','PDI predoctoral');
 INSERT INTO profesor VALUES('PR048','48034341Q','Jose Manuel','Nevado','Veras','jose.manuel.nevado.veras@ucm.com','Calle Arlanza , 170',28001,'Ajalvir','Madrid','Catedráticos de Universidad');
+
+INSERT INTO profesor VALUES('PR049','11111111V','Carla','Ramis','','carla.cases@ucm.com','Calle de las Acacias , 109',28048,'Manzanares el Real','Madrid','Catedráticos de Universidad');
 
 	-- Importamos los teléfonos de contacto de profesores como archivo .CSV
 LOAD DATA LOCAL INFILE '/home/alumnom/Escritorio/ER/sql_universidad/ficheros de datos externos/telefonosContacto.csv'
@@ -2045,16 +2048,17 @@ GROUP BY categoria
 ORDER BY profesores DESC;
 
 	-- 4) Conocer curso, asignatura, caracter de la asignatura, coordinador y e-mail de contacto
-SELECT asignatura.curso AS curso, asignatura.nombre AS asignatura, asignatura.caracter AS caracter,
+SELECT curso, asignatura.nombre AS asignatura, caracter,
 concat(profesor.nombre, ' ', profesor.apellido1, ' ', profesor.apellido2) AS coordinador, email 
 FROM asignatura INNER JOIN profesor ON (profesor.idProfesor = asignatura.coordinador)
 ORDER BY curso ASC, asignatura ASC;
 
+
 	-- 5) Asignaturas impartidas por profesor de más a menos
- SELECT concat(profesor.nombre, ' ', profesor.apellido1, ' ', profesor.apellido2) AS Profesor, count(impartir.idAsignatura) AS materiasImpartidas
- FROM profesor INNER JOIN impartir ON profesor.idProfesor = impartir.idProfesor 
- GROUP BY impartir.idProfesor
- ORDER BY materiasImpartidas DESC;
+SELECT CONCAT(profesor.nombre, ' ', profesor.apellido1, ' ', profesor.apellido2) AS Profesor, count(impartir.idAsignatura) AS materiasImpartidas
+FROM profesor INNER JOIN impartir ON profesor.idProfesor = impartir.idProfesor 
+GROUP BY impartir.idProfesor
+ORDER BY materiasImpartidas DESC;
  
 	-- 6) Mostrar aquellos alumnos que tienen una media superior a 7.00 y su nota media
 SELECT concat(nombre, ' ', apellido1, ' ', apellido2) AS alumno, round(avg(matricula.nota),2) AS notaMedia
@@ -2137,8 +2141,73 @@ WHERE idAsignatura = (
     WHERE nota = 1.01
 );
 
-SELECT asignatura.nombre
-FROM asignatura asignatura
-JOIN matricula matricula
-    ON asignatura.idAsignatura = matricula.idAsignatura
-WHERE matricula.nota = 1.01;
+SELECT a.nombre
+FROM asignatura a
+JOIN matricula m
+    ON a.idAsignatura = m.idAsignatura
+WHERE m.nota = 1.01;
+
+select nombre, min(nota), max(nota), avg(nota)
+from asignatura, matricula
+where asignatura.idAsignatura = matricula.idAsignatura
+GROUP BY nombre
+order by asignatura.curso asc, asignatura.nombre asc;
+
+SELECT CASE
+    WHEN apellido2 IS NULL 
+        THEN UPPER(CONCAT(nombre, ' ', apellido1))
+    ELSE CONCAT(nombre, ' ', apellido1, ' ', apellido2)
+    END AS "Nombre completo"
+FROM profesor;
+
+SELECT
+    CASE
+        WHEN apellido2 IS NULL
+            THEN UPPER(CONCAT_WS(' ', nombre, apellido1))
+        ELSE CONCAT_WS(' ', nombre, apellido1, apellido2)
+    END AS "Nombre completo"
+FROM profesor;
+
+select * from alumno where apellido1='Martinez'
+
+select * from alumno WHERe fecha_nacimiento>='1994/01/01' and fecha_nacimiento<'1997/01/01'
+
+SELECT * FROM alumno where apellido1 like '%ch%' or apellido2 like '%ch%';
+
+select * from alumno where nombre like '____';
+
+select * from alumno where nombre regexp 's$'
+
+SELECT nombre,apellido1,apellido2,email 
+FROM alumno 
+WHERE email REGEXP '^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+
+UPDATE alumno
+SET email = CONCAT(nombre, '.',apellido1, '@gmail.com');
+
+UPDATE IGNORE alumno
+SET email = CONCAT(
+    LOWER(CONCAT_WS('.', nombre, apellido1, apellido2)),
+    '@gmail.com'
+);
+
+ALTER DATABASE instituto
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_general_ci;
+
+#Devuelve un listado con tres columnas, donde aparezca en la primera columna el nombre y los dos apellidos de los alumnos. En la segunda columna se mostrará una dirección de correo electrónico que vamos a calcular para cada alumno. La dirección de correo estará formada por el nombre y el primer apellido, separados por el carácter . y seguidos por el dominio @iescelia.org. Tenga en cuenta que la dirección de correo electrónico debe estar en minúscula. La tercera columna será una contraseña que vamos a generar formada por los caracteres invertidos del segundo apellido, seguidos de los cuatro caracteres del año de la fecha de nacimiento. Utilice un alias apropiado para cada columna.
+SELECT
+    CONCAT(nombre, ' ', apellido1, ' ', apellido2) AS "Nombre completo",
+
+    LOWER(
+        CONCAT(nombre, '.', apellido1, '@iescelia.org')
+    ) AS "Correo electrónico",
+
+    CONCAT(
+        REVERSE(apellido2),
+
+        '2026' --YEAR(fecha_nacimiento)
+    ) AS "Contraseña"
+
+FROM alumno;
+
