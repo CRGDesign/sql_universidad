@@ -2195,9 +2195,10 @@ ALTER DATABASE instituto
 CHARACTER SET utf8mb4
 COLLATE utf8mb4_general_ci;
 
-#Devuelve un listado con tres columnas, donde aparezca en la primera columna el nombre y los dos apellidos de los alumnos. En la segunda columna se mostrará una dirección de correo electrónico que vamos a calcular para cada alumno. La dirección de correo estará formada por el nombre y el primer apellido, separados por el carácter . y seguidos por el dominio @iescelia.org. Tenga en cuenta que la dirección de correo electrónico debe estar en minúscula. La tercera columna será una contraseña que vamos a generar formada por los caracteres invertidos del segundo apellido, seguidos de los cuatro caracteres del año de la fecha de nacimiento. Utilice un alias apropiado para cada columna.
+#Devuelve un listado con tres columnas, donde aparezca en la primera columna el nombre y los dos apellidos de los alumnos. En la segunda columna se mostrará una dirección de correo electrónico que vamos a calcular para cada alumno. La dirección de correo estará formada por el nombre y el primer apellido, separados por el carácter . y seguidos por el dominio @iescelia.org. Tenga en cuenta que la dirección de correo electrónico debe estar en minúscula. La tercera columna será una contraseña que vamos a generar formada por los caracteres invertidos del segundo apellido, seguidos de los cuatro caracteres del año de la fecha de nacimiento. Utilice un alias apropiado para cada columna. En 2026 cambiar por esto: YEAR(fecha_nacimiento)
+
 SELECT
-    CONCAT(nombre, ' ', apellido1, ' ', apellido2) AS "Nombre completo",
+    CONCAT_WS(nombre, ' ', apellido1, ' ', apellido2) AS "Nombre completo",
 
     LOWER(
         CONCAT(nombre, '.', apellido1, '@iescelia.org')
@@ -2206,8 +2207,11 @@ SELECT
     CONCAT(
         REVERSE(apellido2),
 
-        '2026' --YEAR(fecha_nacimiento)
+        '2026' 
     ) AS "Contraseña"
 
 FROM alumno;
+
+SELECT @@GLOBAL.lc_time_names, @@SESSION.lc_time_names;
+SET lc_time_names = 'es_ES';
 
